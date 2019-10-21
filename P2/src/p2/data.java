@@ -9,14 +9,6 @@ package p2;
  *
  * @author Akuseru
  */
-public class P2 {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        configWindow vent = new configWindow();
-        vent.setVisible(true);
-    }
+public class data {
     
 }
