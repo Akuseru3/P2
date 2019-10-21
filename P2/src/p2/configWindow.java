@@ -66,6 +66,10 @@ public class configWindow extends javax.swing.JFrame {
         listPartitions = new javax.swing.JList<>();
         btnRemovePartition = new javax.swing.JButton();
         lblBG1 = new javax.swing.JLabel();
+        panelPaging = new javax.swing.JPanel();
+        txtPageSize = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        lblBG4 = new javax.swing.JLabel();
         panelBase = new javax.swing.JPanel();
         lblBG3 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -216,6 +220,28 @@ public class configWindow extends javax.swing.JFrame {
         panelFixed.add(lblBG1, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 2, 806, 226));
 
         getContentPane().add(panelFixed, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 250, 810, 230));
+
+        panelPaging.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(114, 137, 218), 2));
+        panelPaging.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        txtPageSize.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        txtPageSize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPageSizeActionPerformed(evt);
+            }
+        });
+        panelPaging.add(txtPageSize, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 110, 160, 30));
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel8.setText("Paging size");
+        panelPaging.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 70, -1, -1));
+
+        lblBG4.setBackground(new java.awt.Color(44, 47, 51));
+        lblBG4.setOpaque(true);
+        panelPaging.add(lblBG4, new org.netbeans.lib.awtextra.AbsoluteConstraints(2, 2, 807, 226));
+
+        getContentPane().add(panelPaging, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 250, 810, 230));
 
         panelBase.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(114, 137, 218), 2));
 
@@ -401,7 +427,7 @@ public class configWindow extends javax.swing.JFrame {
                 }else{
                     if(memorySize>0)
                         partitionsList.add(memorySize);
-                    mainWindow newWindow =new mainWindow(finalCode,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
+                    mainWindow newWindow =new mainWindow(finalCode,-1,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
                     newWindow.setVisible(true);
                     this.dispose();
                 }
@@ -412,14 +438,26 @@ public class configWindow extends javax.swing.JFrame {
                 }else{
                     if(memorySize>0)
                         segmentList.add(memorySize);
-                    mainWindow newWindow =new mainWindow(finalCode,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
+                    mainWindow newWindow =new mainWindow(finalCode,-1,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
                     newWindow.setVisible(true);
                     this.dispose();
+                }
+            }else if(memoryType.equals("Paging")){
+                try{
+                    int pageSize = Integer.parseInt(txtPageSize.getText().trim());
+                    if(pageSize>0){
+                        mainWindow newWindow =new mainWindow(finalCode,pageSize,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
+                        newWindow.setVisible(true);
+                        this.dispose();
+                    }else
+                        JOptionPane.showMessageDialog(null, "Please, insert a valid page size");
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(null, "Please, insert a valid page size");
                 }
             }
             else{
                 this.dispose();
-                mainWindow newWindow =new mainWindow(finalCode,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
+                mainWindow newWindow =new mainWindow(finalCode,-1,memoryType,partitionsList,cpuType,quantum,Integer.parseInt(txtMemory.getText()),Integer.parseInt(txtHDDSize.getText()));
                 newWindow.setVisible(true);
                 this.dispose();
             }
@@ -434,15 +472,23 @@ public class configWindow extends javax.swing.JFrame {
         if(boxMemory.getSelectedItem().toString().equals("Fixed")){
             panelBase.setVisible(false);
             panelSegmentation.setVisible(false);
+            panelPaging.setVisible(false);
             panelFixed.setVisible(true);
         }else if(boxMemory.getSelectedItem().toString().equals("Segmentation")){
             panelBase.setVisible(false);
             panelSegmentation.setVisible(true);
+            panelPaging.setVisible(false);
+            panelFixed.setVisible(false);
+        }else if(boxMemory.getSelectedItem().toString().equals("Paging")){
+            panelBase.setVisible(false);
+            panelSegmentation.setVisible(false);
+            panelPaging.setVisible(true);
             panelFixed.setVisible(false);
         }
         else{
             panelBase.setVisible(true);
             panelSegmentation.setVisible(false);
+            panelPaging.setVisible(false);
             panelFixed.setVisible(false);
         }
     }//GEN-LAST:event_boxMemoryActionPerformed
@@ -569,6 +615,10 @@ public class configWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_boxCPUActionPerformed
 
+    private void txtPageSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPageSizeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPageSizeActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -619,21 +669,25 @@ public class configWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblBG;
     private javax.swing.JLabel lblBG1;
     private javax.swing.JLabel lblBG2;
     private javax.swing.JLabel lblBG3;
+    private javax.swing.JLabel lblBG4;
     private javax.swing.JLabel lblFile;
     private javax.swing.JLabel lblQuantum;
     private javax.swing.JList<String> listPartitions;
     private javax.swing.JList<String> listSegments;
     private javax.swing.JPanel panelBase;
     private javax.swing.JPanel panelFixed;
+    private javax.swing.JPanel panelPaging;
     private javax.swing.JPanel panelSegmentation;
     private javax.swing.JTextField txtHDDSize;
     private javax.swing.JTextField txtMemory;
+    private javax.swing.JTextField txtPageSize;
     private javax.swing.JTextField txtPartition;
     private javax.swing.JTextField txtQuantum;
     private javax.swing.JTextField txtSegment;

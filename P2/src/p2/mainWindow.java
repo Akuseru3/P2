@@ -19,7 +19,7 @@ public class mainWindow extends javax.swing.JFrame {
     int quantum,memorySize,virtualSize;
     String memoryType,cpuType;
     ArrayList<Integer> partsList;List<String[]> code;
-    int sizeOfMemory = 0;int sizeOfVirtual=0;
+    int sizeOfMemory = 0;int sizeOfVirtual=0;int pageSize;
     DefaultListModel<String> memoryData = new DefaultListModel<>();
     DefaultListModel<String> virtualData = new DefaultListModel<>();
     /**
@@ -35,39 +35,98 @@ public class mainWindow extends javax.swing.JFrame {
         listProcesses.setModel(model);
     }
     
-    private void loadMemory(){
-        int index=0;
-        for(int i=0;i<code.size();i++){
-            String[] actual = code.get(i);
-            int weight = Integer.parseInt(actual[4]);
-            if((sizeOfMemory+weight)<=memorySize){
-                sizeOfMemory+=weight;
-                for(int y=0;y<weight;y++){
-                    index++;
-                    memoryData.addElement(index+". "+actual[0]);
-                }
-            }else if((sizeOfVirtual+weight)<=virtualSize){
-                sizeOfVirtual+=weight;
-                for(int y=0;y<weight;y++){
-                    index++;
-                    virtualData.addElement(index+". "+actual[0]);
-                }
-            }
-            else{
-               listProcesses.getModel().getElementAt(i);                
-            }
-        }
-    }
+    
     
     public mainWindow() {
         initComponents();
     }
+    private void setMemoriesPaging(Data memoryInfo){
+            int index1=0;
+            int index2=0;
+            int pageCount1=1;
+            int pageCount2=1;
+            for(int i=0;i<memoryInfo.memoryProcesses.size();i++){                
+                int weight = Integer.parseInt(memoryInfo.memoryProcesses.get(i)[1]);
+                for(int y=0;y<weight;y++){
+                    
+                    if((index1%pageSize)==0){                        
+                        memoryData.addElement("------Page: "+pageCount1+" ------");
+                        pageCount1++;
+                    }                    
+                    index1++;
+                    memoryData.addElement(index1+". "+memoryInfo.memoryProcesses.get(i)[0]);
+                }
+                for(int k=weight;k<pageSize;k++){
+                    if((index1%pageSize)==0){                        
+                        memoryData.addElement("------Page: "+pageCount1+" ------");
+                        pageCount1++;
+                    }                    
+                    index1++;
+                    memoryData.addElement(index1+". FREE SPACE");
+                }
+            }
+            for(int i=0;i<memoryInfo.virtualProcesses.size();i++){                
+                int weight = Integer.parseInt(memoryInfo.virtualProcesses.get(i)[1]);
+                for(int y=0;y<weight;y++){                    
+                    if((index2%pageSize)==0){                        
+                        virtualData.addElement("------Page: "+pageCount2+" ------");
+                        pageCount2++;
+                    }                    
+                    index2++;
+                    virtualData.addElement(index2+". "+memoryInfo.virtualProcesses.get(i)[0]);
+                }
+                for(int k=weight;k<pageSize;k++){
+                    if((index1%pageSize)==0){                        
+                        memoryData.addElement("------Page: "+pageCount2+" ------");
+                        pageCount2++;
+                    }                    
+                    index1++;
+                    memoryData.addElement(index1+". FREE SPACE");
+                }
+            }
+            listMemory.setModel(memoryData);
+            listVirtual.setModel(virtualData);
+    }
     
-    public mainWindow(List<String[]> pCode,String pMemoryType,ArrayList<Integer> pPartsList,String pCpuType,int pQuantum,int pMemorySize,int pVirtualSize){
+    private void setMemoriesDynamic(Data memoryInfo){
+            int index1=0;
+            int index2=0;
+            
+            for(int i=0;i<memoryInfo.memoryProcesses.size();i++){                
+                int weight = Integer.parseInt(memoryInfo.memoryProcesses.get(i)[1]);
+                for(int y=0;y<weight;y++){
+                    
+                    index1++;
+                    memoryData.addElement(index1+". "+memoryInfo.memoryProcesses.get(i)[0]);
+                }
+            }
+            for(int i=0;i<memoryInfo.virtualProcesses.size();i++){                
+                int weight = Integer.parseInt(memoryInfo.virtualProcesses.get(i)[1]);
+                for(int y=0;y<weight;y++){                    
+                    index2++;
+                    virtualData.addElement(index2+". "+memoryInfo.virtualProcesses.get(i)[0]);
+                }
+            }
+            listMemory.setModel(memoryData);
+            listVirtual.setModel(virtualData);
+    }
+    
+    public mainWindow(List<String[]> pCode,int pPageSize,String pMemoryType,ArrayList<Integer> pPartsList,String pCpuType,int pQuantum,int pMemorySize,int pVirtualSize){
         initComponents();
-        code=pCode;memoryType=pMemoryType;partsList=pPartsList;cpuType=pCpuType;quantum= pQuantum;memorySize=pMemorySize;virtualSize=pVirtualSize;        
+        code=pCode;memoryType=pMemoryType;partsList=pPartsList;cpuType=pCpuType;quantum= pQuantum;memorySize=pMemorySize;virtualSize=pVirtualSize;
+        pageSize=pPageSize;
         loadProcesses();
-        loadMemory();
+        Data memoryInfo = new Data();
+        if(pMemoryType.equals("Dynamic")){            
+            memoryInfo.loadMemoryDynamic(code,sizeOfMemory,memorySize,sizeOfVirtual,virtualSize);
+            setMemoriesDynamic(memoryInfo);
+            
+        }else if(pMemoryType.equals("Paging")){
+            memoryInfo.loadMemoryPaging(code,pageSize,sizeOfMemory,memorySize,sizeOfVirtual,virtualSize);
+            setMemoriesPaging(memoryInfo);
+        }        
+        else
+            System.out.println("NO ES DINAMICO");
     }
     
     /**
@@ -162,7 +221,7 @@ public class mainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetActionPerformed
-        mainWindow newWindow =new mainWindow(code,memoryType,partsList,cpuType,quantum,memorySize,virtualSize);
+        mainWindow newWindow =new mainWindow(code,pageSize,memoryType,partsList,cpuType,quantum,memorySize,virtualSize);
         newWindow.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnResetActionPerformed
